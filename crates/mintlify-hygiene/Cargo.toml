@@ -1,0 +1,12 @@
+[package]
+name = "mintlify-hygiene"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "CLI for Mintlify documentation hygiene checks"
+keywords = ["mintlify", "documentation", "cli", "linter"]
+categories = ["command-line-utilities"]
+
+[dependencies]
+clap = { version = "4", features = ["derive", "wrap_help"] }
