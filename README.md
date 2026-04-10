@@ -33,7 +33,7 @@ Common flags:
 
 ## Configuration
 
-Add a `mintlify-hygiene.toml` and tune `[project]` (`docs_dir`, `nav_file`, `include` / `exclude`, `mdx_parse_mode`) plus per-rule `[rules.*]` blocks. Example:
+Add a `mintlify-hygiene.toml` and tune `[project]` (`docs_dir`, `nav_file`, `include` / `exclude`, `mdx_parse_mode`) plus per-rule `[rules.*]` blocks. See [`mintlify-hygiene.sample.toml`](mintlify-hygiene.sample.toml) for a fully documented reference with all rules and their descriptions. Quick example:
 
 ```toml
 [project]
