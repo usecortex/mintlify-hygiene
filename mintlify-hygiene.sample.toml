@@ -1,0 +1,72 @@
+# mintlify-hygiene.sample.toml
+# Full reference configuration for mintlify-hygiene.
+# Copy this file to `mintlify-hygiene.toml` in your project root and adjust as needed.
+
+# ── Project settings ────────────────────────────────────────────────────────
+
+[project]
+
+# Directory containing your Markdown/MDX pages, relative to project root.
+# Default: "docs"
+docs_dir = "docs"
+
+# Path to the Mintlify navigation file, relative to project root.
+# Pages not listed here are flagged by the nav_registration rule.
+# Default: "docs/docs.json"
+nav_file = "docs/docs.json"
+
+# Glob patterns (relative to project root) to explicitly include in checks.
+# When set, only matching files are checked (instead of everything under docs_dir).
+# Default: [] (check all files under docs_dir)
+# include = ["docs/api/**/*.mdx", "docs/guides/**/*.md"]
+
+# Glob patterns (relative to project root) to exclude from all checks.
+# Default: []
+# exclude = ["docs/archive/**", "docs/_drafts/**"]
+
+# How to handle MDX parse failures: "loose" emits a warning, "strict" emits an error.
+# Default: "loose"
+mdx_parse_mode = "loose"
+
+# ── Rules ───────────────────────────────────────────────────────────────────
+#
+# Each rule supports two fields:
+#   enabled  (bool)   — turn the rule on or off. Default: true
+#   level    (string) — "error" or "warn".              Default: "error"
+
+# Raw `<` before a letter or digit outside fenced code blocks.
+# Mintlify can interpret `<200ms` as an HTML tag and break the page.
+# Fix: escape as `&lt;` (e.g. `&lt;200ms`). Fenced code blocks are safe.
+[rules.unescaped_lt]
+enabled = true
+level   = "error"
+
+# YAML frontmatter that fails to parse.
+# A common cause is inner double quotes inside a double-quoted scalar:
+#   description: "Say "yes" here"   <-- broken
+# Fix: use single quotes for the outer delimiter, or escape with \".
+[rules.frontmatter_yaml]
+enabled = true
+level   = "error"
+
+# Special characters in filenames that break Mintlify routing.
+# Parentheses like `setup-(1).md` are the most common offender.
+# Fix: stick to letters, digits, hyphens, underscores, and dots.
+[rules.filename_chars]
+enabled = true
+level   = "error"
+
+# Pages that exist on disk but are not listed in the navigation file (docs.json).
+# Mintlify does not auto-discover pages; unlisted files are invisible to readers.
+# Fix: add the page to the appropriate group in docs.json.
+[rules.nav_registration]
+enabled = true
+level   = "error"
+
+# Unicode em dash (U+2014) in prose text.
+# Overuse of em dashes is a telltale sign of AI-generated content.
+# Fix: use ASCII hyphens with spaces (` - `) or rephrase.
+# Fenced code blocks are ignored.
+[rules.prose_em_dash]
+enabled = true
+level   = "warn"
