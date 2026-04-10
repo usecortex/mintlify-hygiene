@@ -1,0 +1,16 @@
+---
+title: ESM and Expression Skipping
+description: 'Lint rules should not fire inside ESM or expressions'
+---
+
+import Foo from "./foo.js"
+
+export const mode = "fast"
+
+{mode === "fast" ? "ready—now" : "waiting—still"}
+
+Prose here is clean but the component has an issue.
+
+<Card>
+  Inside a component—this dash should be flagged.
+</Card>

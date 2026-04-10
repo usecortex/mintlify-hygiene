@@ -1,0 +1,9 @@
+---
+source: crates/mintlify-hygiene/tests/snapshots.rs
+assertion_line: 128
+expression: "normalize_snapshot_text(&root, &stderr)"
+---
+error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/broken.mdx:13:22
+error: mdx_parse [MDX parse error: Unexpected character `5` (U+0035) before name, expected a character that can start a name, such as a letter, `$`, or `_`] published/broken.mdx:13:23
+error: prose_em_dash [Unicode em dash (U+2014) in prose; use ASCII hyphen spacing instead] published/broken.mdx:15:11
+error: prose_em_dash [Unicode em dash (U+2014) in prose; use ASCII hyphen spacing instead] published/broken.mdx:15:26

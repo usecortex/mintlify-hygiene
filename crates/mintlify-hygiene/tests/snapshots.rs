@@ -106,3 +106,27 @@ fn snapshot_mdx_jsx_structure_report() {
         normalize_snapshot_text(&root, &stderr)
     );
 }
+
+#[test]
+fn snapshot_mdx_esm_expr_skip() {
+    let root = fixture("snapshot-mdx-esm-expr-skip");
+    let out = run_check(&root, &[]);
+    assert!(!out.status.success(), "expected fixture to produce findings");
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert_snapshot!(
+        "mdx_esm_expr_skip",
+        normalize_snapshot_text(&root, &stderr)
+    );
+}
+
+#[test]
+fn snapshot_mdx_parse_fallback_still_lints() {
+    let root = fixture("snapshot-mdx-parse-fallback");
+    let out = run_check(&root, &["--mdx-parse-mode", "strict"]);
+    assert!(!out.status.success(), "expected fixture to produce findings");
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert_snapshot!(
+        "mdx_parse_fallback_still_lints",
+        normalize_snapshot_text(&root, &stderr)
+    );
+}

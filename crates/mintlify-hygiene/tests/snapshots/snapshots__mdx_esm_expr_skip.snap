@@ -1,0 +1,6 @@
+---
+source: crates/mintlify-hygiene/tests/snapshots.rs
+assertion_line: 116
+expression: "normalize_snapshot_text(&root, &stderr)"
+---
+error: prose_em_dash [Unicode em dash (U+2014) in prose; use ASCII hyphen spacing instead] published/esm-expr.mdx:15:21
