@@ -9,8 +9,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: release-${{ github.ref }}
-  cancel-in-progress: true
+  group: build-release
+  cancel-in-progress: false
 
 env:
   CARGO_TERM_COLOR: always
