@@ -52,8 +52,9 @@ TARGET="$(detect_target)"
 
 # ── resolve version ──────────────────────────────────────────────────────────
 if [[ "$VERSION" == "latest" ]]; then
-  VERSION="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
-    | grep '"tag_name"' | head -1 | cut -d'"' -f4)"
+  RELEASE_JSON="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest")"
+  VERSION="$(echo "$RELEASE_JSON" | jq -r .tag_name 2>/dev/null \
+    || echo "$RELEASE_JSON" | grep '"tag_name"' | head -1 | cut -d'"' -f4)"
   if [[ -z "$VERSION" ]]; then
     echo "Failed to resolve latest release version." >&2
     exit 1
@@ -85,9 +86,9 @@ echo "Verifying checksum..."
 curl -fsSL --retry 3 -o "${TMP}/SHA256SUMS" "$CHECKSUM_URL"
 
 if command -v sha256sum &>/dev/null; then
-  (cd "$TMP" && grep "$ARCHIVE" SHA256SUMS | sha256sum -c --quiet)
+  (cd "$TMP" && grep -F "$ARCHIVE" SHA256SUMS | sha256sum -c --quiet)
 elif command -v shasum &>/dev/null; then
-  (cd "$TMP" && grep "$ARCHIVE" SHA256SUMS | shasum -a 256 -c --quiet)
+  (cd "$TMP" && grep -F "$ARCHIVE" SHA256SUMS | shasum -a 256 -c --quiet)
 else
   echo "Warning: no sha256sum or shasum found, skipping checksum verification." >&2
 fi
@@ -102,14 +103,14 @@ else
   tar xzf "${TMP}/${ARCHIVE}" -C "$TMP/extracted"
 fi
 
-BIN_PATH="$(find "$TMP/extracted" -name "$BINARY" -o -name "${BINARY}.exe" | head -1)"
+BIN_PATH="$(find "$TMP/extracted" \( -name "$BINARY" -o -name "${BINARY}.exe" \) | head -1)"
 if [[ -z "$BIN_PATH" ]]; then
   echo "Binary not found in archive." >&2
   exit 1
 fi
 
 cp "$BIN_PATH" "$DEST/"
-chmod +x "$DEST/${BINARY}"*
+chmod +x "$DEST/$(basename "$BIN_PATH")"
 
-echo "Installed ${BINARY} to ${DEST}/${BINARY}"
+echo "Installed ${BINARY} to ${DEST}/$(basename "$BIN_PATH")"
 "${DEST}/${BINARY}" --version 2>/dev/null || true
