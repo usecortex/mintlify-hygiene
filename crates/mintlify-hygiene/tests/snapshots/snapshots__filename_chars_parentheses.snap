@@ -1,0 +1,5 @@
+---
+source: crates/mintlify-hygiene/tests/snapshots.rs
+expression: "normalize_snapshot_text(&root, &stderr)"
+---
+error: filename_chars [path segment `setup-(1).md` contains `(` or `)`; Mintlify routing can break - use only letters, digits, `_`, `-`, and `.`] docs/setup-(1).md:1:1

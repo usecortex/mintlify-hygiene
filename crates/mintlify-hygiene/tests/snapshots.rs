@@ -84,6 +84,30 @@ fn snapshot_nav_registration_for_root_layout_repo() {
 }
 
 #[test]
+fn snapshot_frontmatter_yaml_broken_quotes() {
+    let root = fixture("snapshot-frontmatter-yaml");
+    let out = run_check(&root, &[]);
+    assert!(!out.status.success(), "expected fixture to produce findings");
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert_snapshot!(
+        "frontmatter_yaml_broken_quotes",
+        normalize_snapshot_text(&root, &stderr)
+    );
+}
+
+#[test]
+fn snapshot_filename_chars_parentheses() {
+    let root = fixture("snapshot-filename-chars");
+    let out = run_check(&root, &[]);
+    assert!(!out.status.success(), "expected fixture to produce findings");
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert_snapshot!(
+        "filename_chars_parentheses",
+        normalize_snapshot_text(&root, &stderr)
+    );
+}
+
+#[test]
 fn snapshot_json_output_for_representative_mintlify_fixture() {
     let root = fixture("snapshot-root-layout-site");
     let out = run_check(&root, &["--json"]);

@@ -1,0 +1,5 @@
+---
+source: crates/mintlify-hygiene/tests/snapshots.rs
+expression: "normalize_snapshot_text(&root, &stderr)"
+---
+error: frontmatter_yaml [frontmatter is not valid YAML (inner quotes in double-quoted scalars often cause this): did not find expected key at line 2 column 20, while parsing a block mapping] docs/broken-quotes.md:2:1
