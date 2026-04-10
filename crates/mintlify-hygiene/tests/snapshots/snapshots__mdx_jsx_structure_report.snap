@@ -3,4 +3,7 @@ source: crates/mintlify-hygiene/tests/snapshots.rs
 assertion_line: 104
 expression: "normalize_snapshot_text(&root, &stderr)"
 ---
+error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/mdx-page.mdx:16:28
 error: mdx_parse [MDX parse error: Unexpected character `2` (U+0032) before name, expected a character that can start a name, such as a letter, `$`, or `_`] published/mdx-page.mdx:16:29
+error: prose_em_dash [Unicode em dash (U+2014) in prose; use ASCII hyphen spacing instead] published/mdx-page.mdx:18:11
+error: prose_em_dash [Unicode em dash (U+2014) in prose; use ASCII hyphen spacing instead] published/mdx-page.mdx:18:26

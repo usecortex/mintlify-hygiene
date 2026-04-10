@@ -19,22 +19,22 @@ pub fn check_markdown_body(
 ) -> Vec<Finding> {
     let body_off = crate::frontmatter::body_start_byte(full_source);
     let body = full_source.get(body_off..).unwrap_or("");
-    if file.extension().and_then(|s| s.to_str()) == Some("mdx")
-        && matches!(mdx_parse_mode, MdxParseMode::Strict)
-    {
-        if let Err(message) = to_mdast(body, &parse_options_for(file)) {
-            return vec![mdx_parse_finding(
-                root,
-                file,
-                full_source,
-                body_off,
-                &message,
-                mdx_parse_mode,
-            )];
-        }
-    }
 
-    let tree = to_mdast(body, &ParseOptions::gfm()).expect("GFM mdast parse");
+    let opts = parse_options_for(file);
+    let (tree, out) = match to_mdast(body, &opts) {
+        Ok(t) => (t, Vec::new()),
+        Err(message) => {
+            let mut findings = Vec::new();
+            if matches!(mdx_parse_mode, MdxParseMode::Strict) {
+                findings.push(mdx_parse_finding(
+                    root, file, full_source, body_off, &message, mdx_parse_mode,
+                ));
+            }
+            // Fall back to GFM so we still lint what we can.
+            let t = to_mdast(body, &ParseOptions::gfm()).expect("GFM mdast parse");
+            (t, findings)
+        }
+    };
 
     let mut ctx = WalkCtx {
         root,
@@ -45,7 +45,7 @@ pub fn check_markdown_body(
         unescaped_level,
         prose_em_dash,
         em_dash_level,
-        out: Vec::new(),
+        out,
     };
     walk_node(&tree, &mut ctx);
     ctx.out
