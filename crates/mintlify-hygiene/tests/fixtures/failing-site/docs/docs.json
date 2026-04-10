@@ -1,0 +1,13 @@
+{
+  "navigation": [
+    {
+      "group": "Docs",
+      "pages": [
+        "unescaped-lt-table",
+        "broken-frontmatter-quotes",
+        "prose-em-dash",
+        "weird-(1)-name"
+      ]
+    }
+  ]
+}

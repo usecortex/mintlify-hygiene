@@ -1,0 +1,26 @@
+# Full-site fixture: every enabled rule should report at least one finding here.
+# Run: mintlify-hygiene check --config mintlify-hygiene.toml
+
+[project]
+docs_dir = "docs"
+nav_file = "docs/docs.json"
+
+[rules.unescaped_lt]
+enabled = true
+level = "error"
+
+[rules.frontmatter_yaml]
+enabled = true
+level = "error"
+
+[rules.filename_chars]
+enabled = true
+level = "error"
+
+[rules.nav_registration]
+enabled = true
+level = "error"
+
+[rules.prose_em_dash]
+enabled = true
+level = "warn"

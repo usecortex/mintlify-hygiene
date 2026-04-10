@@ -1,0 +1,8 @@
+{
+  "navigation": [
+    {
+      "group": "Guide",
+      "pages": ["introduction", "guides/foo"]
+    }
+  ]
+}
