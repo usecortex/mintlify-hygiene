@@ -65,6 +65,7 @@ pub fn lint_project(cfg: &ResolvedConfig) -> anyhow::Result<Vec<Finding>> {
                 &cfg.root,
                 path,
                 &src,
+                cfg.mdx_parse_mode,
                 cfg.unescaped_lt.enabled,
                 cfg.unescaped_lt.level,
                 cfg.prose_em_dash.enabled,

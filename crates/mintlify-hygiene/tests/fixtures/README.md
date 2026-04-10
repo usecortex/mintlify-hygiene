@@ -61,6 +61,12 @@ mintlify-hygiene check --exclude archive/** --exclude published/guide.mdx
 
 `mintlify-hygiene check --auto-fix` currently supports `prose_em_dash` only. It rewrites em dashes in prose, skips fenced code, and then reruns checks.
 
+## MDX parse modes
+
+`mintlify-hygiene check --mdx-parse-mode loose` keeps the current compatibility behavior for `.mdx` files and is the default.
+
+`mintlify-hygiene check --mdx-parse-mode strict` validates `.mdx` input with `markdown-rs` MDX parsing first and reports `mdx_parse` when the file is not valid MDX syntax.
+
 ## Snapshot fixtures
 
 The `snapshot-*` directories are representative Mintlify-style fixtures based on issues seen in `mintlify-docs`, including:

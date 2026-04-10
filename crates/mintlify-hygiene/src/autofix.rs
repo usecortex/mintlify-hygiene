@@ -3,8 +3,9 @@
 
 use crate::config::ResolvedConfig;
 use crate::frontmatter::body_start_byte;
+use crate::markdown::parse_options_for;
 use markdown::mdast::Node;
-use markdown::{to_mdast, ParseOptions};
+use markdown::to_mdast;
 use std::path::Path;
 use walkdir::WalkDir;
 
@@ -37,7 +38,7 @@ pub fn autofix_project(cfg: &ResolvedConfig) -> anyhow::Result<usize> {
         }
 
         let src = std::fs::read_to_string(path)?;
-        let Some(new_src) = apply_markdown_autofixes(&src, cfg) else {
+        let Some(new_src) = apply_markdown_autofixes(&src, cfg, path) else {
             continue;
         };
         std::fs::write(path, new_src)?;
@@ -48,12 +49,12 @@ pub fn autofix_project(cfg: &ResolvedConfig) -> anyhow::Result<usize> {
 }
 
 /// Returns new full document source if any enabled auto-fix changed it.
-pub fn apply_markdown_autofixes(full_source: &str, cfg: &ResolvedConfig) -> Option<String> {
+pub fn apply_markdown_autofixes(full_source: &str, cfg: &ResolvedConfig, file: &Path) -> Option<String> {
     let mut out = full_source.to_string();
     let mut changed = false;
 
     if cfg.prose_em_dash.enabled {
-        if let Some(patched) = replace_prose_em_dashes_in_body(&out) {
+        if let Some(patched) = replace_prose_em_dashes_in_body(&out, file) {
             out = patched;
             changed = true;
         }
@@ -63,10 +64,10 @@ pub fn apply_markdown_autofixes(full_source: &str, cfg: &ResolvedConfig) -> Opti
 }
 
 /// Replace U+2014 with ` - ` only in mdast text/html nodes (same scope as `prose_em_dash` lint).
-fn replace_prose_em_dashes_in_body(full_source: &str) -> Option<String> {
+fn replace_prose_em_dashes_in_body(full_source: &str, file: &Path) -> Option<String> {
     let body_off = body_start_byte(full_source);
     let body = full_source.get(body_off..)?;
-    let tree = to_mdast(body, &ParseOptions::gfm()).expect("GFM mdast parse");
+    let tree = to_mdast(body, &parse_options_for(file)).ok()?;
 
     let mut patches: Vec<(usize, usize, String)> = Vec::new();
     collect_em_dash_patches(&tree, &mut patches);
@@ -229,7 +230,7 @@ mod tests {
     #[test]
     fn em_dash_in_prose_replaced_not_in_fenced_code() {
         let src = "---\ntitle: T\n---\n\nHello—world.\n\n```\nx—y\n```\n";
-        let out = replace_prose_em_dashes_in_body(src).expect("changed");
+        let out = replace_prose_em_dashes_in_body(src, Path::new("page.md")).expect("changed");
         assert!(out.contains("Hello - world."));
         assert!(out.contains("x—y"), "code fence should keep em dash");
     }

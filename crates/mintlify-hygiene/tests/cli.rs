@@ -213,3 +213,48 @@ fn cli_exclude_skips_matching_file_and_folder() {
         String::from_utf8_lossy(&out.stderr)
     );
 }
+
+#[test]
+fn mdx_parse_loose_ignores_parse_errors_and_succeeds() {
+    let root = fixture("mdx-parse-error-site");
+    let out = Command::new(bin())
+        .args([
+            "check",
+            "--root",
+            root.to_str().unwrap(),
+            "--config",
+            root.join("mintlify-hygiene.toml").to_str().unwrap(),
+        ])
+        .output()
+        .expect("run mintlify-hygiene");
+    assert!(
+        out.status.success(),
+        "stderr={}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        !stderr.contains("mdx_parse"),
+        "did not expect mdx_parse in loose mode:\n{stderr}"
+    );
+}
+
+#[test]
+fn mdx_parse_strict_fails() {
+    let root = fixture("mdx-parse-error-site");
+    let out = Command::new(bin())
+        .args([
+            "check",
+            "--root",
+            root.to_str().unwrap(),
+            "--config",
+            root.join("mintlify-hygiene.toml").to_str().unwrap(),
+            "--mdx-parse-mode",
+            "strict",
+        ])
+        .output()
+        .expect("run mintlify-hygiene");
+    assert!(!out.status.success());
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert!(stderr.contains("mdx_parse"), "expected mdx_parse error:\n{stderr}");
+}

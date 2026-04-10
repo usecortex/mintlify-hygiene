@@ -8,6 +8,10 @@ fn default_true() -> bool {
     true
 }
 
+fn default_mdx_parse_mode() -> MdxParseMode {
+    MdxParseMode::Loose
+}
+
 #[derive(Debug, Deserialize)]
 pub struct ConfigFile {
     #[serde(default)]
@@ -27,6 +31,9 @@ pub struct ProjectSection {
     /// Navigation file (for example docs.json), relative to project root.
     #[serde(default = "default_nav_file")]
     pub nav_file: String,
+    /// How to treat MDX parse failures: `loose` warns, `strict` errors.
+    #[serde(default = "default_mdx_parse_mode")]
+    pub mdx_parse_mode: MdxParseMode,
     /// Glob patterns (relative to project root) excluded from all checks.
     #[serde(default)]
     pub exclude: Vec<String>,
@@ -70,6 +77,7 @@ pub struct ResolvedConfig {
     pub nav_file: PathBuf,
     pub include: Option<GlobSet>,
     pub exclude: GlobSet,
+    pub mdx_parse_mode: MdxParseMode,
     pub unescaped_lt: ActiveRule,
     pub frontmatter_yaml: ActiveRule,
     pub filename_chars: ActiveRule,
@@ -81,6 +89,24 @@ pub struct ResolvedConfig {
 pub struct PathFilterOverrides {
     pub include: Vec<String>,
     pub exclude: Vec<String>,
+    pub mdx_parse_mode: Option<MdxParseMode>,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum MdxParseMode {
+    #[default]
+    Loose,
+    Strict,
+}
+
+impl MdxParseMode {
+    pub fn severity(self) -> Severity {
+        match self {
+            MdxParseMode::Loose => Severity::Warn,
+            MdxParseMode::Strict => Severity::Error,
+        }
+    }
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -145,6 +171,7 @@ pub fn resolve(
         Some(build_globset(&include_patterns, "include")?)
     };
     let exclude = build_globset(&exclude_patterns, "exclude")?;
+    let mdx_parse_mode = overrides.mdx_parse_mode.unwrap_or(cfg.project.mdx_parse_mode);
     let walk_root = if include.is_some() {
         root.clone()
     } else {
@@ -158,6 +185,7 @@ pub fn resolve(
         nav_file,
         include,
         exclude,
+        mdx_parse_mode,
         unescaped_lt: ActiveRule::merge(cfg.rules.unescaped_lt.as_ref()),
         frontmatter_yaml: ActiveRule::merge(cfg.rules.frontmatter_yaml.as_ref()),
         filename_chars: ActiveRule::merge(cfg.rules.filename_chars.as_ref()),

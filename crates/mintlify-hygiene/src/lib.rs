@@ -9,7 +9,9 @@ mod markdown;
 mod nav;
 
 pub use autofix::{autofix_project, AUTOFIX_RULE_IDS};
-pub use config::{load_config_file, resolve, ConfigFile, PathFilterOverrides, ResolvedConfig};
+pub use config::{
+    load_config_file, resolve, ConfigFile, MdxParseMode, PathFilterOverrides, ResolvedConfig,
+};
 pub use finding::{print_findings_human, print_findings_json, Finding, Severity};
 pub use lint::lint_project;
 

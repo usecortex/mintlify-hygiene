@@ -1,7 +1,8 @@
 use anyhow::Context;
 use clap::{Parser, Subcommand};
 use mintlify_hygiene::{
-    print_findings_human, print_findings_json, run_lint, PathFilterOverrides, Severity,
+    print_findings_human, print_findings_json, run_lint, MdxParseMode, PathFilterOverrides,
+    Severity,
 };
 use std::path::PathBuf;
 
@@ -10,6 +11,21 @@ use std::path::PathBuf;
 struct Cli {
     #[command(subcommand)]
     command: Commands,
+}
+
+#[derive(Clone, clap::ValueEnum)]
+enum MdxParseModeArg {
+    Loose,
+    Strict,
+}
+
+impl From<MdxParseModeArg> for MdxParseMode {
+    fn from(value: MdxParseModeArg) -> Self {
+        match value {
+            MdxParseModeArg::Loose => MdxParseMode::Loose,
+            MdxParseModeArg::Strict => MdxParseMode::Strict,
+        }
+    }
 }
 
 #[derive(Subcommand)]
@@ -37,6 +53,9 @@ enum Commands {
         /// Glob pattern(s) to exclude, relative to project root. Appends to config `exclude`.
         #[arg(long)]
         exclude: Vec<String>,
+        /// How to treat MDX parse failures: `loose` warns, `strict` errors.
+        #[arg(long, value_enum)]
+        mdx_parse_mode: Option<MdxParseModeArg>,
     },
 }
 
@@ -51,6 +70,7 @@ fn main() -> anyhow::Result<()> {
             auto_fix,
             include,
             exclude,
+            mdx_parse_mode,
         } => {
             let root = root
                 .canonicalize()
@@ -64,7 +84,11 @@ fn main() -> anyhow::Result<()> {
                 &root,
                 &config_path,
                 auto_fix,
-                PathFilterOverrides { include, exclude },
+                PathFilterOverrides {
+                    include,
+                    exclude,
+                    mdx_parse_mode: mdx_parse_mode.map(Into::into),
+                },
             )?;
 
             if json {

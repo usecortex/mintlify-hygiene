@@ -94,3 +94,15 @@ fn snapshot_json_output_for_representative_mintlify_fixture() {
         normalize_snapshot_text(&root, &stdout)
     );
 }
+
+#[test]
+fn snapshot_mdx_jsx_structure_report() {
+    let root = fixture("snapshot-mdx-jsx-structure");
+    let out = run_check(&root, &["--mdx-parse-mode", "strict"]);
+    assert!(!out.status.success(), "expected fixture to produce findings");
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert_snapshot!(
+        "mdx_jsx_structure_report",
+        normalize_snapshot_text(&root, &stderr)
+    );
+}

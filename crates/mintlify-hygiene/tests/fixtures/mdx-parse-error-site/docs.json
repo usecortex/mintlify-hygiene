@@ -1,0 +1,8 @@
+{
+  "navigation": [
+    {
+      "group": "Published",
+      "pages": ["published/bad"]
+    }
+  ]
+}
