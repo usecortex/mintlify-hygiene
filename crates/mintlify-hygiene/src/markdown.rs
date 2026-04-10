@@ -54,6 +54,7 @@ fn walk_node(node: &Node, ctx: &mut WalkCtx<'_>) {
                 ctx,
                 &t.value,
                 t.position.as_ref().map(|p| p.start.offset),
+                true,
             );
         }
         Node::Html(h) => {
@@ -61,6 +62,7 @@ fn walk_node(node: &Node, ctx: &mut WalkCtx<'_>) {
                 ctx,
                 &h.value,
                 h.position.as_ref().map(|p| p.start.offset),
+                false,
             );
         }
         // Code and math literals: do not lint inside.
@@ -106,13 +108,18 @@ fn walk_children(children: &[Node], ctx: &mut WalkCtx<'_>) {
     }
 }
 
-fn scan_slice(ctx: &mut WalkCtx<'_>, text: &str, start_offset_in_body: Option<usize>) {
+fn scan_slice(
+    ctx: &mut WalkCtx<'_>,
+    text: &str,
+    start_offset_in_body: Option<usize>,
+    scan_unescaped_lt: bool,
+) {
     let Some(base_in_body) = start_offset_in_body else {
         return;
     };
     let path = normalize_repo_path(ctx.root, ctx.file);
 
-    if ctx.unescaped_lt {
+    if ctx.unescaped_lt && scan_unescaped_lt {
         let bytes = text.as_bytes();
         for i in 0..bytes.len() {
             if bytes[i] != b'<' {
@@ -154,5 +161,29 @@ fn scan_slice(ctx: &mut WalkCtx<'_>, text: &str, start_offset_in_body: Option<us
                 });
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::check_markdown_body;
+    use crate::finding::Severity;
+    use std::path::Path;
+
+    #[test]
+    fn ignores_mdx_tags_but_flags_prose_less_than() {
+        let src = "### Examples\n\n<Tabs>\n  <Tab title=\"API Request\">\n    ```bash\n    curl --header 'Authorization: Bearer <token>'\n    ```\n  </Tab>\n</Tabs>\n\nCreate responses under <200ms.\n";
+        let findings = check_markdown_body(
+            Path::new("."),
+            Path::new("page.mdx"),
+            src,
+            true,
+            Severity::Error,
+            false,
+            Severity::Warn,
+        );
+        assert_eq!(findings.len(), 1);
+        assert_eq!(findings[0].rule_id, "unescaped_lt");
+        assert_eq!(findings[0].line, 11);
     }
 }

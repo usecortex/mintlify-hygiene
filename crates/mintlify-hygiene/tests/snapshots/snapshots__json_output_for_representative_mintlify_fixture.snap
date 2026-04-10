@@ -8,30 +8,6 @@ expression: "normalize_snapshot_text(&root, &stdout)"
     "rule_id": "unescaped_lt",
     "severity": "error",
     "path": "published/create-api.mdx",
-    "line": 8,
-    "column": 1,
-    "message": "raw `<` before a letter or digit; escape as `&lt;` outside code fences"
-  },
-  {
-    "rule_id": "unescaped_lt",
-    "severity": "error",
-    "path": "published/create-api.mdx",
-    "line": 9,
-    "column": 3,
-    "message": "raw `<` before a letter or digit; escape as `&lt;` outside code fences"
-  },
-  {
-    "rule_id": "unescaped_lt",
-    "severity": "error",
-    "path": "published/create-api.mdx",
-    "line": 11,
-    "column": 36,
-    "message": "raw `<` before a letter or digit; escape as `&lt;` outside code fences"
-  },
-  {
-    "rule_id": "unescaped_lt",
-    "severity": "error",
-    "path": "published/create-api.mdx",
     "line": 17,
     "column": 31,
     "message": "raw `<` before a letter or digit; escape as `&lt;` outside code fences"
@@ -43,14 +19,6 @@ expression: "normalize_snapshot_text(&root, &stdout)"
     "line": 19,
     "column": 12,
     "message": "Unicode em dash (U+2014) in prose; use ASCII hyphen spacing instead"
-  },
-  {
-    "rule_id": "unescaped_lt",
-    "severity": "error",
-    "path": "published/create-api.mdx",
-    "line": 21,
-    "column": 1,
-    "message": "raw `<` before a letter or digit; escape as `&lt;` outside code fences"
   },
   {
     "rule_id": "nav_registration",

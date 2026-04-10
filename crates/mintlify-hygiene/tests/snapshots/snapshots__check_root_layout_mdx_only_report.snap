@@ -3,10 +3,6 @@ source: crates/mintlify-hygiene/tests/snapshots.rs
 assertion_line: 43
 expression: "normalize_snapshot_text(&root, &stderr)"
 ---
-error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-api.mdx:8:1
-error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-api.mdx:9:3
-error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-api.mdx:11:36
 error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-api.mdx:17:31
 error: prose_em_dash [Unicode em dash (U+2014) in prose; use ASCII hyphen spacing instead] published/create-api.mdx:19:12
-error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-api.mdx:21:1
 error: nav_registration [page not listed in nav (<ROOT>/docs.json); add it to navigation so readers can open it] published/orphan.mdx:1:1

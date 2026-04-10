@@ -30,7 +30,8 @@ fn run_check(root: &Path, extra_args: &[&str]) -> std::process::Output {
 }
 
 fn normalize_snapshot_text(root: &Path, text: &str) -> String {
-    text.replace(root.to_string_lossy().as_ref(), "<ROOT>")
+    let root_str = root.to_string_lossy().into_owned();
+    text.replace(&root_str, "<ROOT>")
         .replace('\\', "/")
 }
 

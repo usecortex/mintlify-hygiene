@@ -2,6 +2,11 @@
 
 These examples exist so you can see **what should fail** before the linter is fully wired. Each item maps to a rule id the CLI reports.
 
+The CLI now lints both `.md` and `.mdx` files. The fixtures also cover two common Mintlify layouts:
+
+- classic docs-root sites such as `docs/docs.json`
+- repo-root sites with `docs.json` at the project root and `include` / `exclude` globs
+
 ## Rule snippets (one concern each)
 
 Read these files first. They are not a full Mintlify tree; they show the pattern in isolation.
@@ -16,7 +21,7 @@ Read these files first. They are not a full Mintlify tree; they show the pattern
 | `prose_em_dash`    | `rule-snippets/em-dash-in-prose.md`                | Unicode em dash (U+2014) in body prose. Style rule to avoid “obviously generated” copy. Fenced code blocks are ignored.                                |
 
 
-Safe contrast: fenced code is allowed to contain `<` and em dashes. See `rule-snippets/ok-in-fenced-code.md`.
+Safe contrast: fenced code is allowed to contain `<` and em dashes. See `rule-snippets/ok-in-fenced-code.md`. MDX component tags such as `<Tabs>` and `<Tab title="...">` should not trigger `unescaped_lt`.
 
 ## Full failing site
 
@@ -37,3 +42,30 @@ You should see multiple findings with stable rule ids until everything is fixed.
 ## Good site
 
 Directory `good-site/` is a minimal layout expected to produce **zero** findings with default rules enabled.
+
+## Root-layout fixtures
+
+Directory `root-layout-site/` models a Mintlify repo that keeps `docs.json` at the repo root and uses:
+
+- `include = ["published/**/*.mdx"]` to scope checks to published pages
+- `exclude = [...]` to skip repo-meta or snippet content
+
+Directory `root-layout-site-overrides/` exists to exercise CLI overrides such as:
+
+```bash
+mintlify-hygiene check --include published/index.mdx
+mintlify-hygiene check --exclude archive/** --exclude published/guide.mdx
+```
+
+## Auto-fix
+
+`mintlify-hygiene check --auto-fix` currently supports `prose_em_dash` only. It rewrites em dashes in prose, skips fenced code, and then reruns checks.
+
+## Snapshot fixtures
+
+The `snapshot-*` directories are representative Mintlify-style fixtures based on issues seen in `mintlify-docs`, including:
+
+- MDX component tags mixed with real prose `<...` findings
+- em dashes in callouts and list prose
+- repo-root nav registration failures
+- human and JSON snapshot output for regression coverage
