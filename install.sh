@@ -53,7 +53,7 @@ TARGET="$(detect_target)"
 # ── resolve version ──────────────────────────────────────────────────────────
 if [[ "$VERSION" == "latest" ]]; then
   RELEASE_JSON="$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest")"
-  VERSION="$(echo "$RELEASE_JSON" | jq -r .tag_name 2>/dev/null \
+  VERSION="$(echo "$RELEASE_JSON" | jq -r '.tag_name // empty' 2>/dev/null \
     || echo "$RELEASE_JSON" | grep '"tag_name"' | head -1 | cut -d'"' -f4)"
   if [[ -z "$VERSION" ]]; then
     echo "Failed to resolve latest release version." >&2
