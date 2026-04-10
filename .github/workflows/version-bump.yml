@@ -1,0 +1,54 @@
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 0.2.0, 1.0.0-rc.1). No leading 'v'."
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+# Shared concurrency group with release.yml — only one build/release at a time.
+concurrency:
+  group: build-release
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  bump:
+    name: Bump to v${{ inputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+          # Use PAT so the pushed tag triggers the Release workflow.
+          # (Pushes from the default GITHUB_TOKEN do not trigger other workflows.)
+          token: ${{ secrets.RELEASE_PAT }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install git-cliff
+        uses: taiki-e/install-action@735e5933943122c5ac182670a935f54a949265c1 # v2
+        with:
+          tool: git-cliff
+
+      - name: Run bump-version script
+        env:
+          VERSION: ${{ inputs.version }}
+        run: ./scripts/bump-version.sh "$VERSION"
+
+      - name: Push commit and tag
+        run: git push origin HEAD --follow-tags
