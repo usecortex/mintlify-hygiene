@@ -100,3 +100,50 @@ fn deny_warnings_ok_on_clean_site() {
         .expect("run mintlify-hygiene");
     assert!(out.status.success());
 }
+
+#[test]
+fn auto_fix_replaces_prose_em_dash_then_passes() {
+    let dir = tempfile::tempdir().expect("tempdir");
+    let root = dir.path();
+    let fixture = fixture("warn-only-site");
+    for rel in ["mintlify-hygiene.toml", "docs/page.md", "docs/docs.json"] {
+        let from = fixture.join(rel);
+        let to = root.join(rel);
+        std::fs::create_dir_all(to.parent().expect("parent")).expect("mkdir");
+        std::fs::copy(&from, &to).expect("copy fixture file");
+    }
+
+    let out = Command::new(bin())
+        .args([
+            "check",
+            "--root",
+            root.to_str().expect("utf8 root"),
+            "--config",
+            root.join("mintlify-hygiene.toml").to_str().expect("utf8 config"),
+            "--auto-fix",
+            "--deny-warnings",
+        ])
+        .output()
+        .expect("run mintlify-hygiene");
+
+    assert!(
+        out.status.success(),
+        "stderr={}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    let stderr = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        stderr.contains("auto-fix updated 1 file"),
+        "expected autofix notice in stderr:\n{stderr}"
+    );
+
+    let page = std::fs::read_to_string(root.join("docs/page.md")).expect("read page");
+    assert!(
+        page.contains("One em dash - not two hyphens."),
+        "expected spaced hyphen replacement, got:\n{page}"
+    );
+    assert!(
+        !page.contains('\u{2014}'),
+        "em dash should be removed from prose"
+    );
+}

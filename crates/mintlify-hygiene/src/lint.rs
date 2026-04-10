@@ -34,7 +34,7 @@ pub fn lint_project(cfg: &ResolvedConfig) -> anyhow::Result<Vec<Finding>> {
         if !path.is_file() {
             continue;
         }
-        if path.extension().and_then(|s| s.to_str()) != Some("md") {
+        if !is_markdown_doc_file(path) {
             continue;
         }
 
@@ -98,6 +98,13 @@ pub fn lint_project(cfg: &ResolvedConfig) -> anyhow::Result<Vec<Finding>> {
     });
 
     Ok(findings)
+}
+
+fn is_markdown_doc_file(path: &Path) -> bool {
+    matches!(
+        path.extension().and_then(|s| s.to_str()),
+        Some("md" | "mdx")
+    )
 }
 
 fn doc_slug(cfg: &ResolvedConfig, path: &Path) -> String {

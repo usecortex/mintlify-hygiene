@@ -43,8 +43,10 @@ fn collect_pages(v: &Value, set: &mut HashSet<String>) {
 }
 
 fn normalize_slug(s: &str) -> String {
-    s.trim()
-        .trim_start_matches("./")
-        .trim_end_matches(".md")
-        .replace('\\', "/")
+    let t = s.trim().trim_start_matches("./");
+    let without_ext = t
+        .strip_suffix(".mdx")
+        .or_else(|| t.strip_suffix(".md"))
+        .unwrap_or(t);
+    without_ext.replace('\\', "/")
 }

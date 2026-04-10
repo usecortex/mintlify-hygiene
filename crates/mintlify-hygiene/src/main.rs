@@ -26,6 +26,9 @@ enum Commands {
         /// Treat warnings as errors for exit status.
         #[arg(long)]
         deny_warnings: bool,
+        /// Apply auto-fixes for supported rules (e.g. `prose_em_dash`), then run checks.
+        #[arg(long)]
+        auto_fix: bool,
     },
 }
 
@@ -37,6 +40,7 @@ fn main() -> anyhow::Result<()> {
             config,
             json,
             deny_warnings,
+            auto_fix,
         } => {
             let root = root
                 .canonicalize()
@@ -46,7 +50,7 @@ fn main() -> anyhow::Result<()> {
             } else {
                 root.join(&config)
             };
-            let findings = run_lint(&root, &config_path)?;
+            let findings = run_lint(&root, &config_path, auto_fix)?;
 
             if json {
                 print_findings_json(&findings)?;
