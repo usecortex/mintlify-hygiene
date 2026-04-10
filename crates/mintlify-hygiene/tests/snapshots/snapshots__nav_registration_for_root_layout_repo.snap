@@ -1,0 +1,6 @@
+---
+source: crates/mintlify-hygiene/tests/snapshots.rs
+assertion_line: 79
+expression: "normalize_snapshot_text(&root, &stderr)"
+---
+error: nav_registration [page not listed in nav (<ROOT>/docs.json); add it to navigation so readers can open it] published/missing-from-nav.mdx:1:1

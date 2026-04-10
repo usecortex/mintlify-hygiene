@@ -147,3 +147,69 @@ fn auto_fix_replaces_prose_em_dash_then_passes() {
         "em dash should be removed from prose"
     );
 }
+
+#[test]
+fn root_layout_site_passes_with_repo_local_include_and_exclude() {
+    let root = fixture("root-layout-site");
+    let out = Command::new(bin())
+        .args([
+            "check",
+            "--root",
+            root.to_str().unwrap(),
+            "--config",
+            root.join("mintlify-hygiene.toml").to_str().unwrap(),
+        ])
+        .output()
+        .expect("run mintlify-hygiene");
+    assert!(
+        out.status.success(),
+        "stderr={}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+}
+
+#[test]
+fn cli_include_overrides_config_include_set() {
+    let root = fixture("root-layout-site-overrides");
+    let out = Command::new(bin())
+        .args([
+            "check",
+            "--root",
+            root.to_str().unwrap(),
+            "--config",
+            root.join("mintlify-hygiene.toml").to_str().unwrap(),
+            "--include",
+            "published/index.mdx",
+        ])
+        .output()
+        .expect("run mintlify-hygiene");
+    assert!(
+        out.status.success(),
+        "stderr={}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+}
+
+#[test]
+fn cli_exclude_skips_matching_file_and_folder() {
+    let root = fixture("root-layout-site-overrides");
+    let out = Command::new(bin())
+        .args([
+            "check",
+            "--root",
+            root.to_str().unwrap(),
+            "--config",
+            root.join("mintlify-hygiene.toml").to_str().unwrap(),
+            "--exclude",
+            "published/guide.mdx",
+            "--exclude",
+            "archive/**",
+        ])
+        .output()
+        .expect("run mintlify-hygiene");
+    assert!(
+        out.status.success(),
+        "stderr={}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+}

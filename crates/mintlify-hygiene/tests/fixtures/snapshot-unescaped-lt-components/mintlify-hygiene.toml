@@ -1,0 +1,16 @@
+[project]
+docs_dir = "."
+nav_file = "docs.json"
+include = ["published/**/*.mdx"]
+
+[rules.frontmatter_yaml]
+enabled = false
+
+[rules.filename_chars]
+enabled = false
+
+[rules.nav_registration]
+enabled = false
+
+[rules.prose_em_dash]
+enabled = false

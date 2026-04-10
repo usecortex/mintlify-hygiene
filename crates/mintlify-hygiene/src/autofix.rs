@@ -18,11 +18,11 @@ fn is_markdown_doc_file(path: &Path) -> bool {
     )
 }
 
-/// Apply all enabled auto-fixes to markdown files under `docs_dir`. Returns count of files written.
+/// Apply all enabled auto-fixes to matching markdown files. Returns count of files written.
 pub fn autofix_project(cfg: &ResolvedConfig) -> anyhow::Result<usize> {
     let mut fixed_files = 0usize;
 
-    for entry in WalkDir::new(&cfg.docs_dir)
+    for entry in WalkDir::new(&cfg.walk_root)
         .into_iter()
         .filter_map(|e| e.ok())
     {
@@ -32,7 +32,7 @@ pub fn autofix_project(cfg: &ResolvedConfig) -> anyhow::Result<usize> {
         }
         let rel_root = path.strip_prefix(&cfg.root).unwrap_or(path);
         let key = rel_root.to_string_lossy().replace('\\', "/");
-        if cfg.exclude.is_match(&key) {
+        if !cfg.matches_project_path(&key) {
             continue;
         }
 

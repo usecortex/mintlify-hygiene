@@ -1,0 +1,5 @@
+[project]
+docs_dir = "."
+nav_file = "docs.json"
+include = ["published/**/*.mdx"]
+exclude = ["snippets/**"]

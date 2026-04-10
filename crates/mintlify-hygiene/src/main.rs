@@ -1,6 +1,8 @@
 use anyhow::Context;
 use clap::{Parser, Subcommand};
-use mintlify_hygiene::{print_findings_human, print_findings_json, run_lint, Severity};
+use mintlify_hygiene::{
+    print_findings_human, print_findings_json, run_lint, PathFilterOverrides, Severity,
+};
 use std::path::PathBuf;
 
 #[derive(Parser)]
@@ -29,6 +31,12 @@ enum Commands {
         /// Apply auto-fixes for supported rules (e.g. `prose_em_dash`), then run checks.
         #[arg(long)]
         auto_fix: bool,
+        /// Glob pattern(s) to include, relative to project root. Replaces config `include`.
+        #[arg(long)]
+        include: Vec<String>,
+        /// Glob pattern(s) to exclude, relative to project root. Appends to config `exclude`.
+        #[arg(long)]
+        exclude: Vec<String>,
     },
 }
 
@@ -41,6 +49,8 @@ fn main() -> anyhow::Result<()> {
             json,
             deny_warnings,
             auto_fix,
+            include,
+            exclude,
         } => {
             let root = root
                 .canonicalize()
@@ -50,7 +60,12 @@ fn main() -> anyhow::Result<()> {
             } else {
                 root.join(&config)
             };
-            let findings = run_lint(&root, &config_path, auto_fix)?;
+            let findings = run_lint(
+                &root,
+                &config_path,
+                auto_fix,
+                PathFilterOverrides { include, exclude },
+            )?;
 
             if json {
                 print_findings_json(&findings)?;

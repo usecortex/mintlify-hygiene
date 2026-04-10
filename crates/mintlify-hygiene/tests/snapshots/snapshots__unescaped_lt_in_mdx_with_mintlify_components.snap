@@ -1,0 +1,11 @@
+---
+source: crates/mintlify-hygiene/tests/snapshots.rs
+assertion_line: 55
+expression: "normalize_snapshot_text(&root, &stderr)"
+---
+error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-embeddings.mdx:8:1
+error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-embeddings.mdx:9:3
+error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-embeddings.mdx:11:42
+error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-embeddings.mdx:14:3
+error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-embeddings.mdx:21:46
+error: unescaped_lt [raw `<` before a letter or digit; escape as `&lt;` outside code fences] published/create-embeddings.mdx:23:21

@@ -22,11 +22,11 @@ pub fn lint_project(cfg: &ResolvedConfig) -> anyhow::Result<Vec<Finding>> {
         None
     };
 
-    if !cfg.docs_dir.is_dir() {
-        anyhow::bail!("docs_dir is not a directory: {}", cfg.docs_dir.display());
+    if !cfg.walk_root.is_dir() {
+        anyhow::bail!("scan root is not a directory: {}", cfg.walk_root.display());
     }
 
-    for entry in WalkDir::new(&cfg.docs_dir)
+    for entry in WalkDir::new(&cfg.walk_root)
         .into_iter()
         .filter_map(|e| e.ok())
     {
@@ -40,7 +40,7 @@ pub fn lint_project(cfg: &ResolvedConfig) -> anyhow::Result<Vec<Finding>> {
 
         let rel_root = path.strip_prefix(&cfg.root).unwrap_or(path);
         let key = rel_root.to_string_lossy().replace('\\', "/");
-        if cfg.exclude.is_match(&key) {
+        if !cfg.matches_project_path(&key) {
             continue;
         }
 
